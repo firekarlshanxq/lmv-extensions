@@ -7,7 +7,8 @@ function initialize() {
     };
     var viewerElement = document.getElementById('viewer');
     var viewer = new Autodesk.Viewing.Private.GuiViewer3D(viewerElement,
-        {extensions: ['Autodesk.ADN.Viewing.Extension.ExtensionManager'], apiUrl: 'api/extensions', extensionsUrl: 'extensions', extensionsSourceUrl: 'extensions'});
+        {extensions: ['XiqiaoShanFirstExtension','MeshTester'], apiUrl: 'api/extensions', extensionsUrl: 'extensions', extensionsSourceUrl: 'extensions'});
+    console.log(viewer);
     Autodesk.Viewing.Initializer(
         options,
         function() {
@@ -41,6 +42,9 @@ function loadDocument(viewer, documentId) {
                 'type' : 'geometry',
                 'role' : '3d'
             }, true);
+            console.log(doc);
+            console.log(geometryItems[0]);
+            console.log(doc.getViewablePath(geometryItems[0]));
             if (geometryItems.length > 0) {
                 viewer.load(doc.getViewablePath(geometryItems[0]));
             }
