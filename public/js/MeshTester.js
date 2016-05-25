@@ -15,21 +15,22 @@ MeshTester = function (viewer,options) {
         return true;
     };
 
-    var cssScene, cssRenderer, camera, controls;
+    var cssScene, cssRenderer, camera, controls, glRenderer,glScene;
     ///////////////////////////////////////////////////////////////////
     // Creates WebGL Renderer
     //
     ///////////////////////////////////////////////////////////////////
-    /*function createGlRenderer() {
-        var glRenderer = new THREE.WebGLRenderer({alpha:true});
+    function createGlRenderer() {
+        var glRenderer = viewer.impl.glrenderer();
+        glRenderer.alpha = true;
         glRenderer.setClearColor(0xECF8FF);
         glRenderer.setPixelRatio(window.devicePixelRatio);
         glRenderer.setSize(window.innerWidth, window.innerHeight);
-        glRenderer.domElement.style.position = 'absolute';
+        //glRenderer.domElement.style.position = 'absolute';
         glRenderer.domElement.style.zIndex = 1;
         glRenderer.domElement.style.top = 0;
         return glRenderer;
-    }*/
+    }
     ///////////////////////////////////////////////////////////////////
     // Creates CSS Renderer
     //
@@ -38,7 +39,7 @@ MeshTester = function (viewer,options) {
         var cssRenderer = new THREE.CSS3DRenderer();
         cssRenderer.setSize(window.innerWidth, window.innerHeight);
         cssRenderer.domElement.style.position = 'absolute';
-        viewer.impl.glrenderer().domElement.style.zIndex = 0;
+        glRenderer.domElement.style.zIndex = 0;
         cssRenderer.domElement.style.top = 0;
         return cssRenderer;
     };
@@ -94,7 +95,7 @@ MeshTester = function (viewer,options) {
             w, h,
             position,
             rotation);
-        viewer.impl.scene.add(plane);
+        glScene.add(plane);
         var cssObject = createCssObject(
             w, h,
             position,
@@ -146,28 +147,30 @@ MeshTester = function (viewer,options) {
     //
     ///////////////////////////////////////////////////////////////////
     function initialize() {
-        camera = new THREE.PerspectiveCamera(
+
+        /*camera = new THREE.PerspectiveCamera(
             45,
             window.innerWidth / window.innerHeight,
             1,
-            10000);
+            10000);*/
+        camera = viewer.impl.camera;
         camera.position.set(0, 100, 3000);
         camera.getEffectiveFOV = function(){
             return 45;
         }
         console.log(camera);
         controls = new THREE.TrackballControls(camera);
-        //glRenderer = createGlRenderer();*/
+        glRenderer = createGlRenderer();
         console.log("11");
         console.log(viewer.impl);
         console.log(viewer.impl.glrenderer());
         cssRenderer = createCssRenderer();
         //document.body.appendChild(glRenderer.domElement);
-
+        console.log(glRenderer.domElement);
 
         document.body.appendChild(cssRenderer.domElement);
-        cssRenderer.domElement.appendChild(viewer.impl.glrenderer().domElement);
-        //glScene = new THREE.Scene();
+        cssRenderer.domElement.appendChild(glRenderer.domElement);
+        glScene = viewer.impl.scene;
         cssScene = new THREE.Scene();
        /* var ambientLight = new THREE.AmbientLight(0x555555);
         glScene.add(ambientLight);
@@ -189,8 +192,9 @@ MeshTester = function (viewer,options) {
             new THREE.Vector3(1050, 0, 400),
             new THREE.Vector3(0, -45 * Math.PI / 180, 0),
             'http://mongo.autodesk.io');
-        //viewer.impl.invalidate(true);
+
         /*create3dGeometry();*/
+        viewer.impl.sceneUpdated(true);
         update();
     };
     ///////////////////////////////////////////////////////////////////
@@ -199,7 +203,8 @@ MeshTester = function (viewer,options) {
     ///////////////////////////////////////////////////////////////////
     function update() {
         controls.update();
-        viewer.impl.glrenderer().render(viewer.impl.scene,camera)
+
+        glRenderer.render(glScene,camera);
         //console.log(camera);
         cssRenderer.render(cssScene, camera);
         requestAnimationFrame(update);
