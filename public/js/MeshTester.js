@@ -22,12 +22,13 @@ MeshTester = function (viewer,options) {
     ///////////////////////////////////////////////////////////////////
     function createGlRenderer() {
         var glRenderer = viewer.impl.glrenderer();
+        //console.log(viewer.impl.glrenderer());
         glRenderer.alpha = true;
         glRenderer.setClearColor(0xECF8FF);
         glRenderer.setPixelRatio(window.devicePixelRatio);
         glRenderer.setSize(window.innerWidth, window.innerHeight);
         glRenderer.domElement.style.position = 'absolute';
-        //glRenderer.domElement.style.zIndex = 1;
+        glRenderer.domElement.style.zIndex = 1;
         glRenderer.domElement.style.top = 0;
         return glRenderer;
     }
@@ -39,7 +40,7 @@ MeshTester = function (viewer,options) {
         var cssRenderer = new THREE.CSS3DRenderer();
         cssRenderer.setSize(window.innerWidth, window.innerHeight);
         cssRenderer.domElement.style.position = 'absolute';
-        glRenderer.domElement.style.zIndex = 0;
+        //glRenderer.domElement.style.zIndex = 0;
         cssRenderer.domElement.style.top = 0;
         cssRenderer.domElement.style.zIndex = 2;
         return cssRenderer;
@@ -166,7 +167,17 @@ MeshTester = function (viewer,options) {
             return 45;
         }
         console.log(camera);
-        controls = new THREE.TrackballControls(camera);
+        //controls = new THREE.TrackballControls(camera);
+        controls = viewer.impl.controls;
+        /*var oriControls = viewer.impl.controls;
+        controls.deactivateTool = function () {
+            oriControls.deactivateTool();
+        }
+        controls.activateTool = function () {
+            oriControls.activateTool();
+        }
+        viewer.impl.controls = controls;*/
+
         glRenderer = createGlRenderer();
         console.log("11");
         console.log(viewer.impl);
@@ -183,7 +194,7 @@ MeshTester = function (viewer,options) {
         /*document.body.appendChild(cssRenderer.domElement);
         cssRenderer.domElement.appendChild(glRenderer.domElement);*/
         glScene = viewer.impl.scene;
-        cssScene = new THREE.Scene();
+        cssScene = viewer.impl.sceneAfter;
         var ambientLight = new THREE.AmbientLight(0x555555);
         glScene.add(ambientLight);
         var directionalLight = new THREE.DirectionalLight(0xffffff);
@@ -207,6 +218,7 @@ MeshTester = function (viewer,options) {
 
         create3dGeometry();
         viewer.impl.sceneUpdated(true);
+        //viewer.impl.scene.autoUpdate = false;
         update();
     };
     ///////////////////////////////////////////////////////////////////
