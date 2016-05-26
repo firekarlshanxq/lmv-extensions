@@ -5,8 +5,8 @@ MeshTester = function (viewer,options) {
     Autodesk.Viewing.Extension.call(this,viewer,options);
     _self = this;
     _self.load = function () {
-        console.log("MeshTester loaded");
         initialize();
+        console.log("MeshTester loaded");
         return true;
     };
 
@@ -26,8 +26,8 @@ MeshTester = function (viewer,options) {
         glRenderer.setClearColor(0xECF8FF);
         glRenderer.setPixelRatio(window.devicePixelRatio);
         glRenderer.setSize(window.innerWidth, window.innerHeight);
-        //glRenderer.domElement.style.position = 'absolute';
-        glRenderer.domElement.style.zIndex = 1;
+        glRenderer.domElement.style.position = 'absolute';
+        //glRenderer.domElement.style.zIndex = 1;
         glRenderer.domElement.style.top = 0;
         return glRenderer;
     }
@@ -41,6 +41,7 @@ MeshTester = function (viewer,options) {
         cssRenderer.domElement.style.position = 'absolute';
         glRenderer.domElement.style.zIndex = 0;
         cssRenderer.domElement.style.top = 0;
+        cssRenderer.domElement.style.zIndex = 2;
         return cssRenderer;
     };
     ///////////////////////////////////////////////////////////////////
@@ -51,7 +52,8 @@ MeshTester = function (viewer,options) {
         var material = new THREE.MeshBasicMaterial({
             color: 0x000000,
             opacity: 0.0,
-            side: THREE.DoubleSide
+            side: THREE.DoubleSide,
+            //blending: THREE.NoBlending
         });
         viewer.impl.matman().addMaterial('planeMat',material,true);
         var geometry = new THREE.PlaneGeometry(w, h);
@@ -90,12 +92,13 @@ MeshTester = function (viewer,options) {
     // Creates 3d webpage object
     //
     ///////////////////////////////////////////////////////////////////
-    function create3dPage(w, h, position, rotation, url) {
+    function create3dPage(w, h, position, rotation, url){
         var plane = createPlane(
             w, h,
             position,
             rotation);
-        glScene.add(plane);
+        //glScene.add(plane);
+
         var cssObject = createCssObject(
             w, h,
             position,
@@ -107,41 +110,45 @@ MeshTester = function (viewer,options) {
     // Creates material with random color
     //
     ///////////////////////////////////////////////////////////////////
-    /*function createColoredMaterial() {
+    function createColoredMaterial() {
         var material = new THREE.MeshBasicMaterial({
             color: Math.floor(Math.random() * 16777215),
             shading: THREE.FlatShading,
             side: THREE.DoubleSide
         });
+        viewer.impl.matman().addMaterial('geoMat' + Math.random(16777215),material,true);
         return material;
-    }*/
+    }
     ///////////////////////////////////////////////////////////////////
     // Creates 3D geometry to place in the scene
     //
     ///////////////////////////////////////////////////////////////////
-    /*function create3dGeometry() {
+    function create3dGeometry() {
         var mesh1 = new THREE.Mesh(
             new THREE.CylinderGeometry(0, 200, 300, 20, 4),
             createColoredMaterial());
         mesh1.position.x = 0;
         mesh1.position.y = -300;
         mesh1.position.z = 400;
-        glScene.add(mesh1);
+        // glScene.add(mesh1);
+        viewer.impl.scene.add(mesh1);
         var mesh2 = new THREE.Mesh(
             new THREE.BoxGeometry(200, 200, 200),
             createColoredMaterial());
         mesh2.position.x = -300;
         mesh2.position.y = -300;
         mesh2.position.z = 400;
-        glScene.add(mesh2);
+        // glScene.add(mesh2);
+        viewer.impl.scene.add(mesh2);
         var mesh3 = new THREE.Mesh(
             new THREE.SphereGeometry(100, 128, 128),
             createColoredMaterial());
         mesh3.position.x = 500;
         mesh3.position.y = -300;
         mesh3.position.z = 400;
-        glScene.add(mesh3);
-    }*/
+        // glScene.add(mesh3);
+        viewer.impl.scene.add(mesh3);
+    }
     ///////////////////////////////////////////////////////////////////
     // Initializes scene
     //
@@ -163,37 +170,42 @@ MeshTester = function (viewer,options) {
         glRenderer = createGlRenderer();
         console.log("11");
         console.log(viewer.impl);
-        console.log(viewer.impl.glrenderer());
+        console.log(glRenderer);
         cssRenderer = createCssRenderer();
-        //document.body.appendChild(glRenderer.domElement);
-        console.log(glRenderer.domElement);
 
+        console.log(cssRenderer);
+
+        document.body.appendChild(glRenderer.domElement);
         document.body.appendChild(cssRenderer.domElement);
-        cssRenderer.domElement.appendChild(glRenderer.domElement);
+        //glRenderer.domElement.appendChild(cssRenderer.domElement);
+        console.log(glRenderer.domElement);
+        console.log(cssRenderer.domElement);
+        /*document.body.appendChild(cssRenderer.domElement);
+        cssRenderer.domElement.appendChild(glRenderer.domElement);*/
         glScene = viewer.impl.scene;
         cssScene = new THREE.Scene();
-       /* var ambientLight = new THREE.AmbientLight(0x555555);
+        var ambientLight = new THREE.AmbientLight(0x555555);
         glScene.add(ambientLight);
         var directionalLight = new THREE.DirectionalLight(0xffffff);
         directionalLight.position.set( -.5, .5, -1.5 ).normalize();
-        glScene.add(directionalLight);*/
+        glScene.add(directionalLight);
         create3dPage(
             1000, 1000,
-            new THREE.Vector3(-1050, 0, 400),
+            new THREE.Vector3(-1050, 0, -400),
             new THREE.Vector3(0, 45 * Math.PI / 180, 0),
             'http://viewer.autodesk.io/node/ng-gallery/#/home');
         create3dPage(
             900, 1000,
-            new THREE.Vector3(0, 0, 0),
+            new THREE.Vector3(0, 0, -800),
             new THREE.Vector3(0, 0, 0),
             'http://adndevblog.typepad.com/cloud_and_mobile');
         create3dPage(
             1000, 1000,
-            new THREE.Vector3(1050, 0, 400),
+            new THREE.Vector3(1050, 0, -400),
             new THREE.Vector3(0, -45 * Math.PI / 180, 0),
             'http://mongo.autodesk.io');
 
-        /*create3dGeometry();*/
+        create3dGeometry();
         viewer.impl.sceneUpdated(true);
         update();
     };
